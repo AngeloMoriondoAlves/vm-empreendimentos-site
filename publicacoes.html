@@ -50,7 +50,6 @@
       const lastUpdated = document.getElementById("last-updated");
 
       const publications = data.publications || [];
-      let filtered = [...publications];
 
       // Última atualização
       let updatedAt = data.updated_at;
@@ -84,7 +83,7 @@
       function render() {
         resultsContainer.innerHTML = "";
 
-        filtered = publications.filter(p => {
+        let filtered = publications.filter(p => {
           const yearMatch = !yearSelect.value || p.date.startsWith(yearSelect.value);
           const typeMatch = !typeSelect.value || p.type === typeSelect.value;
           return yearMatch && typeMatch;
@@ -97,6 +96,14 @@
           return;
         }
 
+        // Mostra texto do filtro aplicado
+        let filtroTexto = `<h3>Resultados para: 
+          ${yearSelect.value ? "Ano " + yearSelect.value : "Todos os anos"} | 
+          ${typeSelect.value ? "Tipo " + typeSelect.value : "Todos os tipos"}
+        </h3>`;
+        resultsContainer.innerHTML = filtroTexto;
+
+        // Lista publicações
         filtered.forEach(p => {
           const [y, m, d] = p.date.split("-");
           const item = document.createElement("div");
