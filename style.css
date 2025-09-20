@@ -1,0 +1,57 @@
+body {
+  font-family: 'Open Sans', Arial, Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  background: #fff;
+}
+
+header {
+  background: #0e2a47;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+main {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+footer {
+  background: #f0f0f0;
+  color: #333;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+a {
+  color: #0e2a47;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.link-publicacoes a {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.filters {
+  margin-bottom: 1rem;
+}
+.filters label {
+  margin-right: 0.5rem;
+}
+.filters select {
+  margin-right: 1rem;
+  padding: 0.3rem;
+}
+
+.publication {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}

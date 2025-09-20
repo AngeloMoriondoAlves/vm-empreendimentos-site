@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicações – V & M EMPREENDIMENTOS S/A</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Publicações Societárias</h1>
+  </header>
+
+  <main>
+    <section class="filters">
+      <label for="year">Ano:</label>
+      <select id="year">
+        <option value="">Todos</option>
+      </select>
+
+      <label for="type">Tipo:</label>
+      <select id="type">
+        <option value="">Todos</option>
+      </select>
+    </section>
+
+    <p id="last-updated">Última atualização em: --/--/----</p>
+
+    <section id="results"></section>
+  </main>
+
+  <footer>
+    <p>V & M EMPREENDIMENTOS S/A | CNPJ 35.969.294/0001-49</p>
+  </footer>
+
+  <script>
+    async function loadPublications() {
+      const response = await fetch("docs/manifest.json");
+      const data = await response.json();
+
+      const resultsContainer = document.getElementById("results");
+      const yearSelect = document.getElementById("year");
+      const typeSelect = document.getElementById("type");
+      const lastUpdated = document.getElementById("last-updated");
+
+      const publications = data.publications || [];
+      let filtered = [...publications];
+
+      // Última atualização
+      let updatedAt = data.updated_at;
+      if (!updatedAt && publications.length > 0) {
+        updatedAt = publications
+          .map(p => p.date)
+          .sort((a, b) => b.localeCompare(a))[0];
+      }
+      if (updatedAt) {
+        const [y, m, d] = updatedAt.split("-");
+        lastUpdated.textContent = `Última atualização em: ${d}/${m}/${y}`;
+      }
+
+      // Preenche selects
+      const years = [...new Set(publications.map(p => p.date.split("-")[0]))].sort().reverse();
+      years.forEach(y => {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+      });
+
+      const types = [...new Set(publications.map(p => p.type))];
+      types.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        typeSelect.appendChild(opt);
+      });
+
+      function render() {
+        resultsContainer.innerHTML = "";
+
+        filtered = publications.filter(p => {
+          const yearMatch = !yearSelect.value || p.date.startsWith(yearSelect.value);
+          const typeMatch = !typeSelect.value || p.type === typeSelect.value;
+          return yearMatch && typeMatch;
+        });
+
+        filtered.sort((a, b) => b.date.localeCompare(a.date));
+
+        if (filtered.length === 0) {
+          resultsContainer.innerHTML = "<p>Nenhuma publicação encontrada.</p>";
+          return;
+        }
+
+        filtered.forEach(p => {
+          const [y, m, d] = p.date.split("-");
+          const item = document.createElement("div");
+          item.className = "publication";
+          item.innerHTML = `
+            <p><strong>${d}/${m}/${y}</strong> – ${p.type} – ${p.title}
+            – <a href="docs/${p.file}" target="_blank">Ver Documento</a></p>
+          `;
+          resultsContainer.appendChild(item);
+        });
+      }
+
+      yearSelect.addEventListener("change", render);
+      typeSelect.addEventListener("change", render);
+      render();
+    }
+
+    loadPublications();
+  </script>
+</body>
+</html>
