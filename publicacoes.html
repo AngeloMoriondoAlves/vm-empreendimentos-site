@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Publicações – V & M EMPREENDIMENTOS S/A</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
     <h1>Publicações Societárias</h1>
+    <nav>
+      <a href="index.html">🏠 Home</a>
+      <a href="publicacoes.html">📑 Publicações</a>
+    </nav>
   </header>
-
-  <nav>
-    <a href="index.html">🏠 Home</a>
-    <a href="publicacoes.html">📑 Publicações</a>
-  </nav>
 
   <main>
     <section class="filters">
@@ -37,8 +36,6 @@
 
   <footer>
     <p>V & M EMPREENDIMENTOS S/A | CNPJ 35.969.294/0001-49</p>
-    <p>Endereço: Rua Exemplo, 123 – Cidade/UF</p>
-    <p>Contato disponível em nossos canais oficiais</p>
   </footer>
 
   <script>
@@ -53,19 +50,7 @@
 
       const publications = data.publications || [];
 
-      // Última atualização
-      let updatedAt = data.updated_at;
-      if (!updatedAt && publications.length > 0) {
-        updatedAt = publications
-          .map(p => p.date)
-          .sort((a, b) => b.localeCompare(a))[0];
-      }
-      if (updatedAt) {
-        const [y, m, d] = updatedAt.split("-");
-        lastUpdated.textContent = `Última atualização em: ${d}/${m}/${y}`;
-      }
-
-      // Preenche selects
+      // Preenche os filtros
       const years = [...new Set(publications.map(p => p.date.split("-")[0]))].sort().reverse();
       years.forEach(y => {
         const opt = document.createElement("option");
@@ -82,32 +67,49 @@
         typeSelect.appendChild(opt);
       });
 
-      function render() {
+      // Última atualização
+      if (data.updated_at) {
+        const [y, m, d] = data.updated_at.split("-");
+        lastUpdated.textContent = `Última atualização em: ${d}/${m}/${y}`;
+      }
+
+      // Função para renderizar os resultados
+      function renderResults() {
+        const selectedYear = yearSelect.value;
+        const selectedType = typeSelect.value;
+
+        const filtered = publications
+          .filter(p => (!selectedYear || p.date.startsWith(selectedYear)) &&
+                       (!selectedType || p.type === selectedType))
+          .sort((a, b) => b.date.localeCompare(a.date));
+
         resultsContainer.innerHTML = "";
-
-        let filtered = publications.filter(p => {
-          const yearMatch = !yearSelect.value || p.date.startsWith(yearSelect.value);
-          const typeMatch = !typeSelect.value || p.type === typeSelect.value;
-          return yearMatch && typeMatch;
-        });
-
-        filtered.sort((a, b) => b.date.localeCompare(a.date));
 
         if (filtered.length === 0) {
           resultsContainer.innerHTML = "<p>Nenhuma publicação encontrada.</p>";
           return;
         }
 
-        // Mostra texto do filtro aplicado
-        let filtroTexto = `<h3>Resultados para: 
-          ${yearSelect.value ? "Ano " + yearSelect.value : "Todos os anos"} | 
-          ${typeSelect.value ? "Tipo " + typeSelect.value : "Todos os tipos"}
-        </h3>`;
-        resultsContainer.innerHTML = filtroTexto;
-
-        // Lista publicações
         filtered.forEach(p => {
           const [y, m, d] = p.date.split("-");
           const item = document.createElement("div");
           item.className = "publication";
-         
+          item.innerHTML = `
+            <p><strong>${d}/${m}/${y}</strong> – ${p.type} – ${p.title}
+            – <a href="docs/${p.file}" target="_blank">Ver Documento</a></p>
+          `;
+          resultsContainer.appendChild(item);
+        });
+      }
+
+      // Atualiza ao trocar filtro
+      yearSelect.addEventListener("change", renderResults);
+      typeSelect.addEventListener("change", renderResults);
+
+      renderResults();
+    }
+
+    loadPublications();
+  </script>
+</body>
+</html>
