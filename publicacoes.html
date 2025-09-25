@@ -37,6 +37,8 @@
 
   <footer>
     <p>V & M EMPREENDIMENTOS S/A | CNPJ 35.969.294/0001-49</p>
+    <p>Endereço: Rua Exemplo, 123 – Cidade/UF</p>
+    <p>Contato disponível em nossos canais oficiais</p>
   </footer>
 
   <script>
@@ -108,20 +110,4 @@
           const [y, m, d] = p.date.split("-");
           const item = document.createElement("div");
           item.className = "publication";
-          item.innerHTML = `
-            <p><strong>${d}/${m}/${y}</strong> – ${p.type} – ${p.title}
-            – <a href="docs/${p.file}" target="_blank">Ver Documento</a></p>
-          `;
-          resultsContainer.appendChild(item);
-        });
-      }
-
-      yearSelect.addEventListener("change", render);
-      typeSelect.addEventListener("change", render);
-      render();
-    }
-
-    loadPublications();
-  </script>
-</body>
-</html>
+         
